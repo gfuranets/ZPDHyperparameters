@@ -5,8 +5,8 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from ray import tune
 
 DATASET_TEST_SPLIT = 0.2
-DATASET_SPLIT_RANDOM_STATE = 69
-TRAINING_RANDOM_STATE = 69
+DATASET_SPLIT_RANDOM_STATE = 420
+TRAINING_RANDOM_STATE = 420
 
 class ControllerEvaluator(tune.Trainable):
     def __init__(self, config):

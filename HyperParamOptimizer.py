@@ -1,6 +1,3 @@
-from sklearn.datasets import load_iris, fetch_california_housing
-from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
-from sklearn.metrics import accuracy_score, mean_squared_error
 from ControllerEvaluator import ControllerEvaluator
 import ray
 from ray import tune
@@ -8,11 +5,11 @@ from ray import tune
 RAYTUNE_SAMPLES = 30
 
 # Number of CPU and GPU depends on system
-USE_GPU = True
+USE_GPU = False
 NUM_GPUS = 1.0
 # CPU: 0 tells it to auto-allocate cpu resources
 RAYTUNE_TRIAL_RESOURCES = {
-    "CPU": 0,
+    "CPU": 0 if USE_GPU else 0.1,
     "GPU": NUM_GPUS / RAYTUNE_SAMPLES if USE_GPU else 0.0
 }
 
@@ -34,7 +31,7 @@ def get_search_space(search_algo):
 def objective(config):
     # The function to be minimized by hyperparameter optimization
     controller = ControllerEvaluator(config)
-    return controller.evaluate() 
+    return controller.evaluate()
 
 def main():
     ray.init(num_gpus=NUM_GPUS)
