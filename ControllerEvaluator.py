@@ -44,5 +44,5 @@ class ControllerEvaluator(tune.Trainable):
         california_mse = mean_squared_error(california_test_labels, california_predictions)
 
         # Calculate the mean_metric
-        mean_metric = (iris_accuracy - california_mse) / 2
+        mean_metric = (iris_accuracy + california_mse) / 2
         return {"mean_metric": mean_metric}
