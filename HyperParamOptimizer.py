@@ -65,7 +65,7 @@ def main():
     print("Best hyperparameters found were: ", analysis.best_config)
 
 
-def compare():
+def compare(results_dir: str):
     evaluators: List[IEvaluator] = [RFCEvaluator()]
     dataset_controllers: List[IDatasetController] = [MNISTDatasetController()]
     # Hyperparameter search strategies
@@ -88,7 +88,9 @@ def compare():
                     metric="mean_metric",
                     mode="max",
                     num_samples=1,
-                    resources_per_trial=RAYTUNE_TRIAL_RESOURCES
+                    resources_per_trial=RAYTUNE_TRIAL_RESOURCES,
+                    name="test_run",
+                    storage_path=results_dir
                 )
 
                 print("Best hyperparameters found were: ", analysis.best_config)
