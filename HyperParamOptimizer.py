@@ -1,3 +1,5 @@
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestClassifier
 from ControllerEvaluator import ControllerEvaluator
 import ray
 from ray import tune

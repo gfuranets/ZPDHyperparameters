@@ -17,8 +17,12 @@ class RFCEvaluator(IEvaluator):
 
     # Will probably implement this and some other functions in the IEvaluator
     def set_dataset(self, dataset: DataFrame):
+        # Getting last column
+        y = dataset.iloc[:, -1:]
+        # Getting all but last column
+        x = dataset.iloc[:, :-1]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
-            dataset.data, dataset.target, test_size=0.2, random_state=420)
+            x, y, test_size=0.2, random_state=420)
 
     def get_search_space(self, strategy) -> dict:
         search_space = {}

@@ -10,7 +10,7 @@ class MNISTDatasetController(IDatasetController):
         super().__init__()
 
     def prepare_dataset(self):
-        dataset = fetch_openml('mnist_784', version=1, parser='auto', as_frame=True)
+        dataset = fetch_openml('Fashion-MNIST', version=1, parser='auto', as_frame=True)
         df = DataFrame(dataset.data, columns=dataset.feature_names)
         df['target'] = Series(dataset.target)
 
