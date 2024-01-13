@@ -10,5 +10,6 @@ class IDatasetController(ABC):
         return self.dataset
 
     @abstractmethod
-    def prepare_dataset(self):
+    def get_sets(self):
         pass
+    

@@ -1,4 +1,4 @@
-from HyperParamOptimizer import compare
+from hparam_optimizer import compare
 
 
 if __name__ == '__main__':
