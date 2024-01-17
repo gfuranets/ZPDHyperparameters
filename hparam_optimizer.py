@@ -24,7 +24,7 @@ def compare():
     # [1] - search_space_algo (grid_search, randint, etc.)
     # [2] - num of samples
     strategies = [
-        (BasicVariantGenerator, tune.grid_search, 1),
+        (BasicVariantGenerator(), tune.grid_search, 1),
     ]
 
     for evaluator in evaluators:

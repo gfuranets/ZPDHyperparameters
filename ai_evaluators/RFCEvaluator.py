@@ -13,9 +13,6 @@ class RFCEvaluator(IEvaluator):
             "max_depth": [[1, 10, 20], (0, 20)]
         }
 
-    def get_search_space(self, strategy) -> dict:
-        super().get_search_space(strategy)
-
     def evaluate(self, config):
         clf = RandomForestClassifier(
             n_estimators=config["n_estimators"],
