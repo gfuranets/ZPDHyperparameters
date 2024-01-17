@@ -1,5 +1,6 @@
 import ray
 from ray import tune
+from ray.tune.search.basic_variant import BasicVariantGenerator
 
 from ai_evaluators.IEvaluator import IEvaluator
 from ai_evaluators.RFCEvaluator import RFCEvaluator
@@ -19,18 +20,24 @@ def compare():
     dataset_controllers: List[IDatasetController] = [MNISTDatasetController()]
 
     # Hyperparameter search strategies
-    strategies = [tune.grid_search]
+    # [0] - strategy
+    # [1] - search_space_algo (grid_search, randint, etc.)
+    # [2] - num of samples
+    strategies = [
+        (BasicVariantGenerator, tune.grid_search, 1),
+    ]
 
     for evaluator in evaluators:
+        # Constraining parallel tasks, by assigning minimum resources usage
+        evaluate_with_resources = tune.with_resources(evaluator.evaluate, {"cpu": 1})
+
         for dataset_cont in dataset_controllers:
             # Retrieving train set and data set from the dataset controller
             X_train, X_test, y_train, y_test = dataset_cont.get_sets()
-            for strategy in strategies:
-                # Constraining parallel tasks, by assigning minimum resources usage
-                evaluate_with_resources = tune.with_resources(evaluator.evaluate, {"cpu": 1})
 
+            for strategy, search_space_algo, num_samples in strategies:
                 # Getting a search space with specific strategy
-                search_space = evaluator.get_search_space(strategy)
+                search_space = evaluator.get_search_space(search_space_algo)
 
                 # Passing dataset reference id's to evaluator via config
                 search_space['X_train_id'], search_space['X_test_id'] = ray.put(X_train), ray.put(X_test)
@@ -38,7 +45,13 @@ def compare():
 
                 tuner = tune.Tuner(
                     evaluate_with_resources,
-                    param_space=search_space
+                    param_space=search_space,
+                    tune_config=tune.TuneConfig(
+                        search_alg=strategy,
+                        mode="max",
+                        metric="f1_score",
+                        num_samples=num_samples
+                    )
                 )
                 results = tuner.fit()
                 print(results.get_best_result(metric="f1_score", mode="max").config)

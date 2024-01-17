@@ -9,20 +9,12 @@ class RFCEvaluator(IEvaluator):
     def __init__(self):
         super().__init__()
         self.hyperparameters = {
-            "n_estimators": [10, 30, 100],
-            "max_depth": [1, 10, 20]
+            "n_estimators": [[10, 30, 100], (10, 50)],
+            "max_depth": [[1, 10, 20], (0, 20)]
         }
 
-
     def get_search_space(self, strategy) -> dict:
-        search_space = {}
-
-        # Apply search algorithm for hyperparameters
-        for param, args in self.hyperparameters.items():
-            # *args unpacks tuple for use as arguments in the function
-            search_space[param] = strategy(args)
-
-        return search_space
+        super().get_search_space(strategy)
 
     def evaluate(self, config):
         clf = RandomForestClassifier(
