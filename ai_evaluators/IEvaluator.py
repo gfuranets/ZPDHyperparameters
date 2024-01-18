@@ -24,14 +24,17 @@ class IEvaluator(ABC):
         # Hardcoded:
         # grid_search or choice - use sequence
         # uniform or randint - use range
-        k = 0
+        uses_range = False
         if search_space_algo == tune.uniform or search_space_algo == tune.randint:
-            k = 1
+            uses_range = True
 
         # Apply search algorithm for hyperparameters
         for param, args in self.hyperparameters.items():
             # *args unpacks tuple for use as arguments in the function
-            search_space[param] = search_space_algo(args[k])
+            if uses_range:
+                search_space[param] = search_space_algo(lower=args[1][0], upper=args[1][1])
+            else:
+                search_space[param] = search_space_algo(args[0])
 
         return search_space
 
