@@ -1,4 +1,4 @@
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 
 import numpy as np
 from pandas import DataFrame
@@ -15,7 +15,7 @@ class MNISTDatasetController(IDatasetController):
         dataset["target"] = dataset["target"].astype(np.uint8)
 
         # Scaling data
-        scaler = StandardScaler()
+        scaler = MinMaxScaler()
         dataset["data"] = DataFrame(scaler.fit_transform(dataset["data"].astype(np.float64)))
         self.dataset = dataset
 
