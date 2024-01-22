@@ -30,6 +30,10 @@ class IEvaluator(ABC):
 
         # Apply search algorithm for hyperparameters
         for param, args in self.hyperparameters.items():
+            # some params will have grid_search by default
+            if type(args) != tuple:
+                search_space[param] = args
+                continue
             # *args unpacks tuple for use as arguments in the function
             if uses_range:
                 search_space[param] = search_space_algo(lower=args[1][0], upper=args[1][1])

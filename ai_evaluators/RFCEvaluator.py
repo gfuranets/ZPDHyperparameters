@@ -10,10 +10,10 @@ class RFCEvaluator(IEvaluator):
     def __init__(self):
         super().__init__()
         self.hyperparameters = {
-            "n_estimators": [[10, 30, 100], (10, 100)],
-            "max_depth": [[1, 10, 20], (1, 30)],
-            "min_samples_split": [[2, 3, 5], (2, 6)],
-            "min_samples_leaf": [[1, 3, 5], (1, 6)]
+            "n_estimators": ([15, 45, 70, 100], (10, 100)),
+            "max_depth": ([1, 10, 15, 20], (1, 30)),
+            "min_samples_split": ([2, 3, 4, 5], (2, 6)),
+            "min_samples_leaf": ([1, 3, 4, 6], (1, 6))
         }
 
     def evaluate(self, config):

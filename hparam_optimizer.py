@@ -1,9 +1,14 @@
+from ai_evaluators.SVCEvaluator import SVCEvaluator
 import ray
 from ray import tune
 from ray.tune.search.basic_variant import BasicVariantGenerator
+from ray.tune.search.bayesopt import BayesOptSearch
+from ray.tune.search.zoopt import ZOOptSearch
+from ray.tune.search.hebo import HEBOSearch
 
 from ai_evaluators.IEvaluator import IEvaluator
 from ai_evaluators.RFCEvaluator import RFCEvaluator
+from ai_evaluators.SGDCEvaluator import SGDCEvaluator
 
 from dataset_controllers.IDatasetController import IDatasetController
 from dataset_controllers.MNISTDatasetController import MNISTDatasetController
@@ -14,22 +19,23 @@ from typing import List
 
 def compare():
     # Evaluators, or AI models that will be used in testing
-    evaluators: List[IEvaluator] = [RFCEvaluator()]
+    evaluators: List[IEvaluator] = [SGDCEvaluator()]
 
     # DatasetController constructors also fetch the datasets 
     dataset_controllers: List[IDatasetController] = [MNISTDatasetController()]
 
     # Hyperparameter search strategies
-    # [0] - strategy
-    # [1] - search_space_algo (grid_search, randint, etc.)
-    # [2] - num of samples
     strategies = [
-        (BasicVariantGenerator(), tune.grid_search, 1),
+        # (BayesOptSearch(random_search_steps=4), tune.uniform, 32), # Bayesian Search
+        # (ZOOptSearch(budget=16), tune.randint, 16), # Zeroth-order Optimization Search
+        # (BasicVariantGenerator(), tune.grid_search, 1), # Grid Search
+        # (BasicVariantGenerator(), tune.uniform, 2) # Random Search
+        (HEBOSearch(), tune.uniform, 2), # HUAWEI Search
     ]
 
     for evaluator in evaluators:
         # Constraining parallel tasks, by assigning minimum resources usage
-        evaluate_with_resources = tune.with_resources(evaluator.evaluate, {"cpu": 1})
+        evaluate_with_resources = tune.with_resources(evaluator.evaluate, {"cpu": 1, "gpu": 0.1})
 
         for dataset_cont in dataset_controllers:
             # Retrieving train set and data set from the dataset controller

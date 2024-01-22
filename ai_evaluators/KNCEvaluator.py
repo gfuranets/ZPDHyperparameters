@@ -1,4 +1,4 @@
-from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 from ai_evaluators.IEvaluator import IEvaluator, TRAINING_RANDOM_STATE
 from sklearn.metrics import f1_score
 
@@ -6,23 +6,22 @@ import ray
 from ray import train, tune
 
 
-class SVCEvaluator(IEvaluator):
+class KNCEvaluator(IEvaluator):
     def __init__(self):
         super().__init__()
         self.hyperparameters = {
-            'C': ([0.1, 1, 10], (1e-3, 1e3)),
-            # 'kernel': [['rbf', 'poly'], (0,)],
-            'kernel': [["sigmoid"]],
-            # 'degree': [[2, 3, 5], (2, 5)],  # Only for poly
-            'gamma': ([0.1, 1, 10], (1e-4, 1e2))  # Only for rbf, poly, sigmoid
+            'n_neighbors': ([2, 3, 5, 7], (2, 10)),
+            'algorithm':  [['ball_tree', 'kd_tree']], # 'algorithm': [['brute']] brute just doesn't require leaf_size and p params
+            'leaf_size': ([5, 10, 25, 40], (5, 40)),
+            'p': ([1, 2, 3, 4], (1, 4)),
         }
 
     def evaluate(self, config):
-        clf = SVC(
-            C=config["C"],
-            kernel=config["kernel"],
-            # degree=config['degree'],
-            gamma=config["gamma"]
+        clf = KNeighborsClassifier(
+            n_neighbors=int(config['n_neighbors']),
+            algorithm=config['algorithm'],
+            leaf_size=int(config['leaf_size']),
+            p=int(config['p'])
         )
 
         X_train = ray.get(config["X_train_id"])
