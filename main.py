@@ -2,4 +2,5 @@ from hparam_optimizer import compare
 
 
 if __name__ == '__main__':
-    compare()
+    for _ in range(10):
+        compare()

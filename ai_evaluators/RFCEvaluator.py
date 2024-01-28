@@ -10,13 +10,22 @@ class RFCEvaluator(IEvaluator):
     def __init__(self):
         super().__init__()
         self.hyperparameters = {
-            "n_estimators": ([15, 45, 70, 100], (10, 100)),
-            "max_depth": ([1, 10, 15, 20], (1, 30)),
-            "min_samples_split": ([2, 3, 4, 5], (2, 6)),
-            "min_samples_leaf": ([1, 3, 4, 6], (1, 6))
+            "n_estimators": ([15, 45, 70, 85, 100], (10, 100)),
+            "max_depth": ([5, 10, 15, 20, 25], (5, 30)),
+            "min_samples_split": ([2, 3, 4, 5, 6], (2, 6)),
+            "min_samples_leaf": ([1, 2, 3, 4, 6], (1, 6))
         }
+        # self.searched_params = {}
 
     def evaluate(self, config):
+        # if self.searched_params[(
+        #     int(config["n_estimators"]),
+        #     int(config["max_depth"]),
+        #     int(config["min_samples_split"]),
+        #     int(config["min_samples_leaf"])
+        # )]:
+        #     return
+
         clf = RandomForestClassifier(
             n_estimators=int(config["n_estimators"]),
             max_depth=int(config["max_depth"]),
