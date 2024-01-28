@@ -30,7 +30,7 @@ class ExperimentStopper(Stopper):
     def __call__(self, trial_id, result):
         if result["f1_score"] >= MAXIMUM_SCORE:
             self.should_stop = True
-        return self.should_stop or result["been_searched"]
+        return self.should_stop
 
     def stop_all(self):
         return self.should_stop
