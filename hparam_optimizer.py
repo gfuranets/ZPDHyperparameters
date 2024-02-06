@@ -47,7 +47,7 @@ def compare():
     strategies = [
         (BayesOptSearch(random_search_steps=10), tune.uniform, 625),  # Bayesian Search
         # (ZOOptSearch(budget=500), tune.randint, 500),  # Zeroth-order Optimization Search
-        # (BasicVariantGenerator(), tune.grid_search, 1),  # Grid Search
+        (BasicVariantGenerator(), tune.grid_search, 1),  # Grid Search
         # (BasicVariantGenerator(), tune.randint, 500),  # Random Search
         # (HEBOSearch(), tune.randint, 500),  # HUAWEI Search
     ]

@@ -10,9 +10,10 @@ class SGDCEvaluator(IEvaluator):
     def __init__(self):
         super().__init__()
         self.hyperparameters = {
-            "alpha": ([1e-4, 1e-3, 1e-2, 1e-1], (1e-4, 1e-1)),
-            "eta0": ([1e-4, 1e-3, 1e-2, 1e-1], (1e-4, 1e-1)),
-            "power_t": ([-3, -1, 0.5, 2], (-5, 5)),
+            "alpha": ([1e-5, 1e-4, 1e-3, 1e-2, 1e-1], (1e-4, 1e-1)),
+            "eta0": ([1e-5, 1e-4, 1e-3, 1e-2, 1e-1], (1e-4, 1e-1)),
+            "power_t": ([-2, -1, 0.5, 1, 2], (-5, 5)),
+            "max_iter": ([100, 300, 500, 700, 1000], (100, 1000)),
             "loss": tune.choice(["log", "modified_huber", "squared_hinge", "perceptron"])
         }
 
@@ -20,7 +21,9 @@ class SGDCEvaluator(IEvaluator):
         clf = SGDClassifier(
             alpha=config['alpha'],
             eta0=config['eta0'],
-            power_t=config['power_t']
+            power_t=config['power_t'],
+            max_iter=config["max_iter"],
+            loss="hinge"
         )
 
         X_train = ray.get(config["X_train_id"])
