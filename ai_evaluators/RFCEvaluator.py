@@ -15,16 +15,17 @@ class RFCEvaluator(IEvaluator):
             "min_samples_split": ([2, 3, 4, 5, 6], (2, 6)),
             "min_samples_leaf": ([1, 2, 3, 4, 6], (1, 6))
         }
-        # self.searched_params = {}
 
     def evaluate(self, config):
-        # if self.searched_params[(
-        #     int(config["n_estimators"]),
-        #     int(config["max_depth"]),
-        #     int(config["min_samples_split"]),
-        #     int(config["min_samples_leaf"])
-        # )]:
-        #     return
+        params = (
+            int(config["n_estimators"]),
+            int(config["max_depth"]),
+            int(config["min_samples_split"]),
+            int(config["min_samples_leaf"])
+        )
+
+        if params in config['searched_params']:
+            return train.report({"f1_score": config['searched_params'][params]})
 
         clf = RandomForestClassifier(
             n_estimators=int(config["n_estimators"]),
@@ -45,5 +46,5 @@ class RFCEvaluator(IEvaluator):
         f1 = f1_score(y_test, predictions, average='micro')
 
         train.report({"f1_score": f1})
-
+        config['searched_params'][params] = f1
 

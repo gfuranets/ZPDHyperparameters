@@ -20,7 +20,7 @@ from typing import List
 
 
 # Value of maximum score is acquired by running full grid search
-MAXIMUM_SCORE = 1
+MAXIMUM_SCORE = 0.9708
 
 
 class ExperimentStopper(Stopper):
@@ -45,16 +45,16 @@ def compare():
 
     # Hyperparameter search strategies
     strategies = [
-        # (BayesOptSearch(random_search_steps=4), tune.uniform, 32),  # Bayesian Search
+        (BayesOptSearch(random_search_steps=10), tune.uniform, 625),  # Bayesian Search
         # (ZOOptSearch(budget=500), tune.randint, 500),  # Zeroth-order Optimization Search
         # (BasicVariantGenerator(), tune.grid_search, 1),  # Grid Search
         # (BasicVariantGenerator(), tune.randint, 500),  # Random Search
-        (HEBOSearch(), tune.randint, 500),  # HUAWEI Search
+        # (HEBOSearch(), tune.randint, 500),  # HUAWEI Search
     ]
 
     for evaluator in evaluators:
         # Constraining parallel tasks, by assigning minimum resources usage
-        evaluate_with_resources = tune.with_resources(evaluator.evaluate, {"cpu": 8})
+        evaluate_with_resources = tune.with_resources(evaluator.evaluate, {"cpu": 1})
 
         for dataset_cont in dataset_controllers:
             # Retrieving train set and data set from the dataset controller
@@ -67,6 +67,8 @@ def compare():
                 # Passing dataset reference id's to evaluator via config
                 search_space['X_train_id'], search_space['X_test_id'] = ray.put(X_train), ray.put(X_test)
                 search_space['y_train_id'], search_space['y_test_id'] = ray.put(y_train), ray.put(y_test)
+
+                search_space['searched_params'] = {}
 
                 tuner = tune.Tuner(
                     evaluate_with_resources,
