@@ -14,7 +14,6 @@ class SGDCEvaluator(IEvaluator):
             "eta0": ([1e-5, 1e-4, 1e-3, 1e-2, 1e-1], (1e-4, 1e-1)),
             "power_t": ([-2, -1, 0.5, 1, 2], (-5, 5)),
             "max_iter": ([100, 300, 500, 700, 1000], (100, 1000)),
-            "loss": tune.choice(["log", "modified_huber", "squared_hinge", "perceptron"])
         }
 
     def evaluate(self, config):
@@ -22,7 +21,7 @@ class SGDCEvaluator(IEvaluator):
             alpha=config['alpha'],
             eta0=config['eta0'],
             power_t=config['power_t'],
-            max_iter=config["max_iter"],
+            max_iter=int(config["max_iter"]),
             loss="hinge"
         )
 

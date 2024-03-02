@@ -20,7 +20,7 @@ from typing import List
 
 
 # Value of maximum score is acquired by running full grid search
-MAXIMUM_SCORE = 0.9708
+MAXIMUM_SCORE = 0.87540
 
 
 class ExperimentStopper(Stopper):
@@ -41,15 +41,15 @@ def compare():
     evaluators: List[IEvaluator] = [RFCEvaluator()]
 
     # DatasetController constructors also fetch the datasets 
-    dataset_controllers: List[IDatasetController] = [MNISTDatasetController()]
+    dataset_controllers: List[IDatasetController] = [MNISTFashionDatasetController()]
 
     # Hyperparameter search strategies
     strategies = [
-        (BayesOptSearch(random_search_steps=10), tune.uniform, 625),  # Bayesian Search
-        # (ZOOptSearch(budget=500), tune.randint, 500),  # Zeroth-order Optimization Search
-        (BasicVariantGenerator(), tune.grid_search, 1),  # Grid Search
-        # (BasicVariantGenerator(), tune.randint, 500),  # Random Search
-        # (HEBOSearch(), tune.randint, 500),  # HUAWEI Search
+        # (BayesOptSearch(random_search_steps=10), tune.uniform, 625),  # Bayesian Search
+        # (ZOOptSearch(budget=625), tune.randint, 625),  # Zeroth-order Optimization Search
+        # (BasicVariantGenerator(), tune.grid_search, 1),  # Grid Search
+        (BasicVariantGenerator(), tune.uniform, 625),  # Random Search
+        # (HEBOSearch(), tune.uniform, 625),  # HUAWEI Search
     ]
 
     for evaluator in evaluators:
