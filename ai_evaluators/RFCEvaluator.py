@@ -1,6 +1,7 @@
 from ai_evaluators.IEvaluator import IEvaluator, TRAINING_RANDOM_STATE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix
 
 import ray
 from ray import train
@@ -40,11 +41,22 @@ class RFCEvaluator(IEvaluator):
         y_train = ray.get(config["y_train_id"])
         y_test = ray.get(config["y_test_id"])
 
-
         clf.fit(X_train, y_train)
         predictions = clf.predict(X_test)
-        f1 = f1_score(y_test, predictions, average='micro')
 
-        train.report({"f1_score": f1})
+        f1 = f1_score(y_test, predictions, average='micro')
+        
+        # Calculate confusion matrix metrics
+        tn, fp, fn, tp = confusion_matrix(y_test, predictions, labels=[0, 1]).ravel()
+        
+        train.report({
+            "f1_score": f1,
+            "accuracy": (tp + tn) / (tp + tn + fp + fn),
+            "tp": tp,
+            "tn": tn,
+            "fp": fp,
+            "fn": fn,
+        })
+
         config['searched_params'][params] = f1
 
