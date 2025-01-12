@@ -1,66 +1,67 @@
-import os
 from sklearn.preprocessing import MinMaxScaler
+import os
+import cv2
 import numpy as np
 from pandas import DataFrame
 from dataset_controllers.IDatasetController import IDatasetController
-from PIL import Image
 
-class BrainTumorController(IDatasetController):
+# Function to load images from a folder
+def load_images_from_folder(folder_path, label):
+    images = []
+    labels = []
+    for filename in os.listdir(folder_path):
+        img_path = os.path.join(folder_path, filename)
+        if os.path.isfile(img_path):
+            img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)  # Read image as grayscale
+            if img is not None:
+                images.append(img)
+                labels.append(label)
+    return images, labels
+
+# Function to resize images
+def preprocess_images(images, target_size=(64, 64)):
+    resized_images = []
+    for img in images:
+        img_resized = cv2.resize(img, target_size)  # Resize to 64x64
+        resized_images.append(img_resized)
+    return np.array(resized_images)
+
+class BrainTumorDatasetController(IDatasetController):
     def __init__(self):
-        super().__init__()
-        dataset_path = r"C:\Users\furen\OneDrive\Dators\Education\School\ZPD\img"
+        # Define paths for the dataset
+        testing_tumor_folder = r"C:\Users\furen\OneDrive\Dators\Education\School\ZPD\img\testing\tumor"
+        testing_no_tumor_folder = r"C:\Users\furen\OneDrive\Dators\Education\School\ZPD\img\testing\no_tumor"
+        training_tumor_folder = r"C:\Users\furen\OneDrive\Dators\Education\School\ZPD\img\training\tumor"
+        training_no_tumor_folder = r"C:\Users\furen\OneDrive\Dators\Education\School\ZPD\img\training\no_tumor"
         
-        # Directories
-        self.training_tumor = os.path.join(dataset_path, "training", "tumor")
-        self.training_no_tumor = os.path.join(dataset_path, "training", "no_tumor")
-        self.testing_tumor = os.path.join(dataset_path, "testing", "tumor")
-        self.testing_no_tumor = os.path.join(dataset_path, "testing", "no_tumor")
+        # Load images and their labels
+        self.train_tumor_images, self.train_tumor_labels = load_images_from_folder(training_tumor_folder, label=1)
+        self.train_no_tumor_images, self.train_no_tumor_labels = load_images_from_folder(training_no_tumor_folder, label=0)
+        self.test_tumor_images, self.test_tumor_labels = load_images_from_folder(testing_tumor_folder, label=1)
+        self.test_no_tumor_images, self.test_no_tumor_labels = load_images_from_folder(testing_no_tumor_folder, label=0)
+
+        # Preprocess images (resize them)
+        self.train_tumor_images = preprocess_images(self.train_tumor_images)
+        self.train_no_tumor_images = preprocess_images(self.train_no_tumor_images)
+        self.test_tumor_images = preprocess_images(self.test_tumor_images)
+        self.test_no_tumor_images = preprocess_images(self.test_no_tumor_images)
+
+        # Combine all images for easier handling
+        self.images = (self.train_tumor_images,
+                       self.train_no_tumor_images,
+                       self.test_tumor_images,
+                       self.test_no_tumor_images)
         
-        # Load and preprocess data
-        self.X_train, self.y_train = self._load_data(self.training_tumor, self.training_no_tumor)
-        self.X_test, self.y_test = self._load_data(self.testing_tumor, self.testing_no_tumor)
-        
-        # Scale data
-        self.scaler = MinMaxScaler()
-        self.X_train = self._scale_data(self.X_train)
-        self.X_test = self._scale_data(self.X_test)
-    
-    def _load_data(self, tumor_dir, no_tumor_dir):
-        """Load images and labels from the specified directories."""
-        X, y = [], []
-        
-        # Load tumor images
-        for file_name in os.listdir(tumor_dir):
-            file_path = os.path.join(tumor_dir, file_name)
-            image = self._process_image(file_path)
-            if image is not None:
-                X.append(image)
-                y.append(1)  # Label for tumor
-        
-        # Load no tumor images
-        for file_name in os.listdir(no_tumor_dir):
-            file_path = os.path.join(no_tumor_dir, file_name)
-            image = self._process_image(file_path)
-            if image is not None:
-                X.append(image)
-                y.append(0)  # Label for no tumor
-        
-        return np.array(X), np.array(y)
-    
-    def _process_image(self, file_path):
-        """Load and preprocess a single image."""
-        try:
-            # Open image, convert to grayscale, resize, and flatten
-            image = Image.open(file_path).convert("L").resize((64, 64))  # Example size: 64x64
-            return np.array(image).flatten()
-        except Exception as e:
-            print(f"Error processing image {file_path}: {e}")
-            return None
-    
-    def _scale_data(self, X):
-        """Scale the data using MinMaxScaler."""
-        return self.scaler.fit_transform(X)
-    
     def get_sets(self):
-        """Return the training and testing sets."""
-        return self.X_train, self.X_test, self.y_train, self.y_test
+        # Combine images and labels into training and testing sets
+        X_train = np.concatenate([self.train_tumor_images, self.train_no_tumor_images], axis=0)
+        y_train = np.concatenate([self.train_tumor_labels, self.train_no_tumor_labels], axis=0)
+
+        X_test = np.concatenate([self.test_tumor_images, self.test_no_tumor_images], axis=0)
+        y_test = np.concatenate([self.test_tumor_labels, self.test_no_tumor_labels], axis=0)
+
+        # Normalize pixel values to the range [0, 1]
+        X_train /= 255.0
+        X_test /= 255.0
+
+        return X_train, X_test, y_train, y_test
