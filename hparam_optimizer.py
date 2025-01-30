@@ -1,7 +1,8 @@
 from ai_evaluators.RFCEvaluator import RFCEvaluator
 
 from dataset_controllers.IDatasetController import IDatasetController
-from dataset_controllers.BrainTumorController import BrainTumorDatasetController
+from dataset_controllers.ForestDatasetController import ForestDatasetController
+from dataset_controllers.MNISTDatasetController import MNISTDatasetController
 
 import ray
 from ray import tune
@@ -27,7 +28,7 @@ from typing import *
 
 def compare(training_count, strategy_position):
     evaluator = RFCEvaluator()
-    dataset_controller: IDatasetController = BrainTumorDatasetController()
+    dataset_controller: IDatasetController = ForestDatasetController()
 
     strategies = [
         ("Random Search", BasicVariantGenerator(), tune.uniform, training_count),  # Random Search
